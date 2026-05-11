@@ -1,0 +1,30 @@
+# Environment variables
+.env
+
+# Large media files
+*.mp4
+*.zip
+*.docx
+*.pdf
+*.jpg
+*.png
+
+# Machine Learning models
+*.pt
+*.onnx
+
+# Data and logs
+data/
+tmp/
+*.log
+crash_log.txt
+debug_output.txt
+lt_output.txt
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local IDE settings
+.vscode/
+.idea/

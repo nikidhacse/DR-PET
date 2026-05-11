@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. PET - Premium Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CRITICAL BOOK OVERRIDES TO ENSURE VISIBILITY */
+        .book-wrapper {
+            width: 300px;
+            height: 400px;
+            position: relative;
+            perspective: 2000px;
+            cursor: pointer;
+            margin: 40px auto !important;
+            transition: all 0.5s ease;
+            z-index: 100;
+        }
+        .book-wrapper.open { width: 600px; }
+        .book-cover-3d {
+            width: 300px;
+            height: 400px;
+            position: absolute;
+            top: 0; left: 0;
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            z-index: 10;
+            transform-style: preserve-3d;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.2);
+        }
+        .book-wrapper.open .book-cover-3d { transform: rotateY(-160deg); }
+        .cover-front {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden;
+            background: #4F9DE7 url('assets/dr_pet_book_cover.png') center/cover;
+            border-radius: 4px 12px 12px 4px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center; padding: 20px;
+        }
+        .book-pages-container {
+            position: absolute; top: 0; left: 0;
+            width: 300px; height: 400px;
+            background: #fff; z-index: 5;
+            display: flex !important; flex-wrap: nowrap !important; overflow: hidden;
+            border-radius: 4px 12px 12px 4px;
+        }
+        .book-wrapper.open .book-pages-container { width: 600px; overflow: visible; }
+        .book-page {
+            background: #fffdf7; width: 300px !important; height: 400px !important;
+            padding: 30px 25px; flex-shrink: 0 !important;
+            border: 1px solid #e2e8f0; overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+            </div>
+            <div class="logo-text">
+                <h1>Dr. PET</h1>
+                <p>Premium Pet Care</p>
+            </div>
+        </div>
+        
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" onclick="switchPage('page-home', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Home
+                    </a>
+                    <a href="#" class="nav-item" onclick="switchPage('page-history', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> History
+                    </a>
+                    <a href="#" class="nav-item" onclick="switchPage('page-analyze', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg> Analyze
+                    </a>
+                    <a href="#" class="nav-item" onclick="switchPage('page-tips', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Tips
+                    </a>
+                    <a href="#" class="nav-item" onclick="switchPage('page-license', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> License
+                    </a>
+                    <a href="#" class="nav-item" onclick="switchPage('page-shop', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg> Shop
+                    </a>
+        </nav>
+        
+        <nav class="nav-section">
+            <a href="#" class="nav-item" onclick="switchPage('page-settings', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
+                    </a>
+                    <a href="#" class="nav-item" onclick="switchPage('page-support', this)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg> Support
+                    </a>
+        </nav>
+        
+        <div class="premium-card">
+            <div class="premium-icon">👑</div>
+            <h3>Go Premium</h3>
+            <p>Unlock advanced features and personalized insights.</p>
+            <button class="premium-btn" onclick="showToast('Redirecting to billing...', '💳')">Upgrade Now</button>
+        </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main-area">
+        <header class="header">
+            <div class="greeting">
+                <h1>Hi Test,</h1>
+                <p>Here's how JONNY is doing today ❤️</p>
+            </div>
+            <div class="user-actions">
+                <div class="icon-btn" onclick="showToast('No new notifications', '🔔')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                </div>
+                <div class="user-profile" onclick="switchPage('page-settings', document.querySelectorAll('.nav-section .nav-item')[0])">
+                    <div class="avatar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <span>Test</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </div>
+        </header>
+        
+        <!-- GLOBAL UPLOAD PROGRESS -->
+        <div id="upload-progress" class="hidden progress-card" style="position: relative; overflow: hidden; margin: 24px;">
+            <div class="scanning-ring"></div>
+            <div class="progress-header">
+                <div class="progress-icon" id="upload-icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v2M12 20v20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"></path></svg></div>
+                <div class="progress-text">
+                    <h4 id="upload-status-title">Analyzing your pet...</h4>
+                    <p id="progress-pct">Starting upload...</p>
+                </div>
+            </div>
+            <div class="progress-track">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- PAGE HOME -->
+        <div id="page-home" class="page-content active">
+            <div class="dashboard-grid">
+                
+                <!-- Left Column -->
+                <div class="left-col">
+                    <!-- Pet Selector -->
+                    <div class="pet-card" onclick="openPetSelector()">
+                        <div class="pet-card-bg"></div>
+                        <div class="pet-avatar-wrapper">
+                            <img src="assets/3d_corgi.png" id="pet-card-icon" alt="Pet Avatar">
+                            <div class="pet-badge">🐾</div>
+                        </div>
+                        <div class="pet-info">
+                            <h2 id="active-pet-name">JONNY <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></h2>
+                            <p>2 yrs • SHITZU</p>
+                            <div class="pet-stats">
+                                <div class="stat-box">
+                                    <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>
+                                    <div class="stat-text"><span>Healthy</span><small>Last checkup 2 days ago</small></div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+                                    <div class="stat-text"><span>Next Checkup</span><small>May 15, 2026</small></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="view-profile-btn" onclick="showToast('Profile page coming soon!', '🐾')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> View Profile</button>
+                    </div>
+                    
+                    <!-- Action Cards -->
+                    <div class="section-title">
+                        <h3>What would you like to do today?</h3>
+                        <p>Choose an option to check up on your best friend.</p>
+                    </div>
+                    <div class="action-cards">
+                        <!-- Upload Video -->
+                        <div class="action-card bg-blue" onclick="document.getElementById('file-input').click()" style="cursor: pointer;">
+                            <div class="card-top">
+                                <div class="card-icon icon-upload"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+                                <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                            </div>
+                            <h4>Share a Moment</h4>
+                            <p>Upload a video to see how they are feeling.</p>
+                            <div class="card-bottom">
+                                <div class="card-image"><img src="assets/3d_cat.png" class="cat-playing"></div>
+                                <input type="file" id="file-input" accept="video/*" class="hidden">
+                                <button class="card-btn btn-upload" id="drop-zone">Upload</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Live Camera -->
+                        <div class="action-card bg-green" onclick="startLiveStream()" style="cursor: pointer;">
+                            <div class="card-top">
+                                <div class="card-icon icon-live"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
+                                <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                            </div>
+                            <h4>Live Camera <span class="live-badge">Live</span></h4>
+                            <p>Watch and analyze in real-time.</p>
+                            <div class="card-bottom">
+                                <div class="card-image"><img src="assets/3d_corgi.png" class="dog-live"></div>
+                                <button class="card-btn btn-live" id="live-stream-btn">Go Live</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Remote Monitor -->
+                        <div class="action-card bg-red" onclick="openRemoteModal()" style="cursor: pointer;">
+                            <div class="card-top">
+                                <div class="card-icon icon-remote"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+                                <div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                            </div>
+                            <h4>Remote Monitor</h4>
+                            <p>Turn an old phone into a smart pet camera.</p>
+                            <div class="card-bottom">
+                                <div class="card-image" style="bottom:-20px;"><img src="assets/security_cam.png" style="opacity:0.8; mix-blend-mode: multiply;"></div>
+                                <button class="card-btn btn-remote">Connect</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden UI wrappers for functionality -->
+                    <div id="live-feed-container" class="hidden">
+                        
+                        <div id="live-container" style="border-radius:24px;overflow:hidden;position:relative;background:#000;height:400px;box-shadow:var(--shadow-md);">
+                            <video id="live-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+                            <canvas id="live-canvas" class="hidden"></canvas>
+                            <div style="position:absolute;top:16px;left:16px;background:rgba(0,0,0,0.7);border-radius:999px;padding:6px 14px;display:flex;align-items:center;gap:8px;">
+                                <span style="width:8px;height:8px;background:#E53E3E;border-radius:50%;animation:pulse-soft 1s infinite;"></span>
+                                <span style="color:white;font-size:12px;font-weight:700;">LIVE</span>
+                            </div>
+                            <div style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.7);border-radius:999px;padding:6px 14px;">
+                                <span id="api-status-text" style="color:white;font-size:12px;font-weight:500;">Connecting...</span>
+                                <span id="api-status-pill"></span>
+                            </div>
+                            <button id="stop-stream-btn" onclick="stopLiveStream()" style="position:absolute;bottom:16px;right:16px;background:#E53E3E;color:white;border:none;border-radius:16px;padding:10px 20px;font-weight:800;font-size:14px;cursor:pointer;">End Session</button>
+                        </div>
+
+                        <div id="live-detection-box" style="background:#1A202C;border-radius:24px;padding:24px;color:white;display:flex;flex-direction:column;height:400px;box-shadow:var(--shadow-md);">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <span style="font-weight:800;font-size:15px;color:#E2E8F0;">AI Analysis Engine</span>
+                                </div>
+                                <span id="live-obs-count" style="font-size:12px;color:#A0AEC0;background:rgba(255,255,255,0.1);padding:4px 8px;border-radius:8px;">0 observations</span>
+                            </div>
+                            <div id="live-animal-type" style="font-size:14px;color:#A0AEC0;margin-bottom:12px;">🔍 Scanning for subject...</div>
+                            <div id="live-behavior-display" style="font-size:24px;font-weight:800;color:#81E6D9;margin-bottom:16px;min-height:36px;"></div>
+                            
+                            <div style="display:flex;justify-content:space-between;font-size:11px;color:#A0AEC0;margin-bottom:6px;font-weight:600;">
+                                <span>Detection confidence</span>
+                                <span id="live-confidence-pct">0%</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.1);height:8px;border-radius:4px;margin-bottom:20px;overflow:hidden;">
+                                <div id="live-confidence-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#4F9DE7,#319795);border-radius:4px;transition:width 0.3s;"></div>
+                            </div>
+                            
+                            <h4 style="font-size:12px;color:#718096;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:800;">Real-time Log</h4>
+                            <div id="live-observation-feed" style="display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding-right:8px;"></div>
+                            <div id="marker-log" class="hidden"></div>
+                        </div>
+
+                    </div>
+
+                    <div id="synthesis-ready-banner" class="hidden" style="margin-top:16px;background:#EBF8FF;border-radius:24px;padding:20px;text-align:center;">
+                        <p style="color:var(--primary);font-weight:800;margin-bottom:16px;">Enough data collected!</p>
+                        <button onclick="window.finalizeLiveSession()" style="background:var(--primary);color:white;border:none;border-radius:16px;padding:14px 24px;font-weight:800;cursor:pointer;">Generate Clinical Report</button>
+                    </div>
+
+
+                </div> <!-- /left-col -->
+                
+
+                <div class="right-col">
+                    <!-- Daily Tip -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <span style="color:#F6E05E;">💡</span>
+                            <h4>Daily Tip</h4>
+                        </div>
+                        <div class="tip-content">
+                            <p>A 30-minute walk can boost your dog's mood and improve sleep.</p>
+                            <div class="tip-image">
+                                <img src="assets/3d_corgi.png" alt="Tip graphic">
+                            </div>
+                            <a href="#" class="widget-link" onclick="switchPage('page-tips', document.querySelector('.nav-item:nth-child(4)'))">See More Tips →</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <span style="color:var(--primary);">🕒</span>
+                            <h4>Recent Activity</h4>
+                        </div>
+                        <div class="activity-list" id="recent-activity-list">
+                            <div style="text-align:center; padding: 20px; color: var(--text-muted); font-size: 13px;">
+                                Loading activity...
+                            </div>
+                        </div>
+                        <a href="#" class="widget-link" onclick="switchPage('page-history', document.querySelector('.nav-item:nth-child(2)'))">View All History →</a>
+                    </div>
+                </div> <!-- /right-col -->
+                
+            </div> <!-- /dashboard-grid -->
+        </div> <!-- /page-home -->
+
+        <!-- PAGE HISTORY -->
+        <div id="page-history" class="page-content">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Behavior History</h2>
+                <p style="color: var(--text-muted);">Your pet's past analyses</p>
+            </div>
+            <div id="history-list">
+                <div style="text-align:center;padding:60px 20px;color:var(--text-muted);">
+                    <div style="font-size:56px;margin-bottom:16px;">🔍</div>
+                    <p style="font-weight:700; font-size: 18px; color: var(--text-main); margin-bottom: 8px;">No analyses yet</p>
+                    <p style="font-size:14px;">Run a video or live analysis to see results here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE ANALYZE -->
+        <div id="page-analyze" class="page-content">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Detailed Metrics</h2>
+                <p style="color: var(--text-muted);">Advanced sensory charts</p>
+            </div>
+            
+            <div class="analysis-results-wrapper hidden" id="analysis-results" style="margin-bottom: 24px;">
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg> Behavior Insight</h3>
+                        <span class="result-badge">Just now</span>
+                    </div>
+                    <div class="result-body">
+                        <div class="result-section-title">Summary</div>
+                        <p id="analysis-summary" class="result-summary"></p>
+                        
+                        <div class="result-section-title">Key Observations</div>
+                        <div id="keyPointsList" class="result-list"></div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                            <div>
+                                <div class="result-section-title">Personality Type</div>
+                                <div id="personality-badge" style="background: #F0F7FF; color: var(--primary); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; border: 1px solid #EBF8FF;">...</div>
+                            </div>
+                            <div>
+                                <div class="result-section-title">Environmental Fit</div>
+                                <div id="env-fit-badge" style="background: #F0FFF4; color: var(--success); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; border: 1px solid #F0FFF4;">...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="result-section-title" style="color:var(--success);">Recommended Action</div>
+                        <div id="recommendations" class="recommendation-box"></div>
+                        
+                        <!-- EMERGENCY / EMOTIONAL GUIDE -->
+                        <div id="behavior-management-guide" style="margin-top:20px; padding:20px; border-radius:16px; border: 2px dashed #E53E3E; background: #FFF5F5; display:none;">
+                            <h4 id="guide-title" style="margin-bottom:8px; display:flex; align-items:center; gap:8px; color: #C53030; font-weight: 800;"></h4>
+                            <p id="guide-text" style="font-size:13px; color: #742A2A; line-height:1.6; font-weight: 500;"></p>
+                        </div>
+                    </div>
+                    <a href="#" id="downloadAuditBtn" class="download-btn hidden">View Full Clinical Report →</a>
+                </div>
+            </div>
+
+            <div style="background: var(--white-solid); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 24px;">
+                <h3 style="margin-bottom: 16px;">Behavior Activity</h3>
+                <div style="height: 200px;"><canvas id="behaviorChart"></canvas></div>
+            </div>
+            <div style="background: var(--white-solid); border-radius: var(--radius-xl); padding: 24px;">
+                <h3 style="margin-bottom: 16px;">Acoustic Frequencies</h3>
+                <div style="height: 200px;"><canvas id="fftChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- PAGE TIPS (3D BOOK UI) -->
+        <div id="page-tips" class="page-content">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
+                <button onclick="switchPage('page-home', document.querySelector('.nav-item:nth-child(1)'))" style="background: none; border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; font-weight: 700; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Back to Home
+                </button>
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    <div class="toggle-container" style="background: var(--border); border-radius: 99px; padding: 4px; display: flex; gap: 4px;">
+                        <button id="toggle-manual" onclick="switchBook('manual')" style="background: white; border: none; border-radius: 99px; padding: 6px 16px; font-weight: 700; cursor: pointer; font-size: 13px; box-shadow: var(--shadow-sm);">Wisdom Manual</button>
+                        <button id="toggle-journal" onclick="switchBook('journal')" style="background: none; border: none; border-radius: 99px; padding: 6px 16px; font-weight: 700; cursor: pointer; font-size: 13px; color: var(--text-muted);">Pet Journal</button>
+                    </div>
+                    <div style="text-align: right;">
+                        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">The Dr. PET Wisdom Book</h2>
+                        <p style="color: var(--text-muted); font-size: 14px;">An interactive guide for first-time pet parents</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MANUAL BOOK -->
+            <div id="manual-book-container">
+                <div class="book-wrapper" id="tips-book-wrapper" onclick="toggleBook()">
+                    <!-- Close Button Overlay -->
+                    <div class="close-book-btn" onclick="event.stopPropagation(); toggleBook()" style="position: absolute; top: -20px; right: -20px; width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); z-index: 100; cursor: pointer; border: 1px solid var(--border); font-weight: 800; color: var(--text-muted);">×</div>
+                    
+                    <div class="book-cover-3d">
+                        <div class="cover-front" style="background-image: url('assets/dr_pet_book_cover.png');"></div>
+                        <div class="cover-back"></div>
+                    </div>
+                    <div class="book-pages-container">
+                        <div class="book-page left-page book-content" id="tips-book-left">
+                            <h3>Pet Wisdom 101</h3>
+                            <div style="text-align: center; margin-top: 40px; color: #a0aec0;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">🐾</div>
+                                <p style="font-style: italic; font-size: 13px; margin-bottom: 20px;">"Open the book to see your personalized guide."</p>
+                                <button onclick="document.getElementById('file-input').click()" style="background: var(--primary); color: white; border: none; border-radius: 12px; padding: 10px 20px; font-weight: 700; cursor: pointer; font-size: 12px; box-shadow: 0 4px 12px rgba(79, 157, 231, 0.3);">Upload New Video</button>
+                            </div>
+                            <div class="page-number">BY DR. PET</div>
+                        </div>
+                        <div class="book-page right-page book-content" id="tips-book-right">
+                            <div id="tips-container-paginated">
+                                <h3>Quick Care Guide</h3>
+                                <div class="tip-item">
+                                    <h4>Get on a Schedule!</h4>
+                                    <p>Pets love knowing what's next. Try to feed and walk them at the same time every day—it makes them feel super safe!</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px;">
+                                 <button onclick="event.stopPropagation(); flipPage(-1)" style="background: none; border: none; cursor: pointer; color: var(--primary); font-weight: 800; font-size: 12px;">← Back</button>
+                                 <div class="page-number" id="tips-page-num" style="font-size: 10px;">PAGE 1</div>
+                                 <button onclick="event.stopPropagation(); flipPage(1)" style="background: none; border: none; cursor: pointer; color: var(--primary); font-weight: 800; font-size: 12px;">Next →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JOURNAL BOOK (HIDDEN BY DEFAULT) -->
+            <div id="journal-book-container" class="hidden">
+                <div class="book-wrapper" id="journal-book-wrapper" onclick="toggleJournal()">
+                    <div class="book-cover-3d">
+                        <div class="cover-front" style="background-image: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);">
+                            <div style="font-size: 64px; margin-bottom: 16px;">📓</div>
+                            <h2 style="font-weight: 800;">My Pet Journal</h2>
+                            <p style="font-size: 14px; opacity: 0.9;">Preserve every tail wag.</p>
+                        </div>
+                        <div class="cover-back"></div>
+                    </div>
+                    <div class="book-pages-container">
+                        <div class="book-page left-page book-content">
+                            <h3>Journal Entries</h3>
+                            <button onclick="event.stopPropagation(); openJournalEntryForm()" style="width:100%; margin-top: 12px; background: #FF9A9E; color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer;">+ New Entry</button>
+                            <div id="journal-entries-list" style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Entries will appear here -->
+                            </div>
+                        </div>
+                        <div class="book-page right-page book-content" id="journal-entry-view">
+                            <div style="text-align: center; margin-top: 80px; color: #a0aec0;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">📸</div>
+                                <p>Select an entry to view details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JOURNAL ENTRY FORM MODAL -->
+        <div id="journal-modal" class="modal-overlay hidden" onclick="closeJournalModal()">
+            <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 500px;">
+                <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 16px;">New Journal Entry</h2>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">ENTRY NOTE</label>
+                        <textarea id="journal-note" placeholder="What happened today?" style="width: 100%; height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; resize: none;"></textarea>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">MEDIA (PHOTO/VIDEO)</label>
+                        <input type="file" id="journal-media" accept="image/*,video/*" style="width: 100%; font-size: 13px;">
+                    </div>
+                    <button class="btn-primary" onclick="window.saveJournalEntry()" style="background: #FF9A9E; color: white; border: none; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer;">Save Entry</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE SHOP -->
+        <div id="page-shop" class="page-content">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Pet Pharmacy & Shop</h2>
+                <p style="color: var(--text-muted);">Curated products for your pet</p>
+            </div>
+            <div style="background: var(--white-solid); border-radius: var(--radius-xl); padding: 32px; text-align: center; color: var(--text-muted);">
+                <div style="font-size: 48px; margin-bottom: 16px;">🛍️</div>
+                <h3 style="color: var(--text-main); margin-bottom: 8px;">Recommended Products</h3>
+                <p>We'll suggest specific supplements, toys, or food based on the AI behavioral analysis.</p>
+            </div>
+        </div>
+
+        <!-- PAGE LICENSE (NEW) -->
+        <div id="page-license" class="page-content">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Pet Licensing India</h2>
+                <p style="color: var(--text-muted);">Mandatory municipal registration for your furry friends.</p>
+            </div>
+
+            <div class="license-grid" style="display: grid; grid-template-columns: 1fr 350px; gap: 24px; align-items: start;">
+                <div class="license-guide">
+                    <!-- Step 1 -->
+                    <div class="step-card" style="background: white; border-radius: 20px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; gap: 20px;">
+                        <div class="step-number" style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">1</div>
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Locate Your Municipal Authority</h3>
+                            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">Pet licensing in India is handled by local municipal corporations. Common ones include MCD (Delhi), BMC (Mumbai), BBMP (Bengaluru), and CCMC (Coimbatore).</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card" style="background: white; border-radius: 20px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; gap: 20px;">
+                        <div class="step-number" style="width: 40px; height: 40px; background: #38A169; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">2</div>
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Prepare Essential Documents</h3>
+                            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">You will need digital copies of:</p>
+                            <ul style="font-size: 14px; color: var(--text-muted); padding-left: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <li>✅ Aadhaar / Address Proof</li>
+                                <li>✅ Rabies Vaccination Certificate</li>
+                                <li>✅ Pet's Photo (Full Body)</li>
+                                <li>✅ Owner's ID Proof</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card" style="background: white; border-radius: 20px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; gap: 20px;">
+                        <div class="step-number" style="width: 40px; height: 40px; background: #805AD5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">3</div>
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Submit Application & Pay Fee</h3>
+                            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">Apply online via the citizen portal or visit the local office. The fee typically ranges from ₹50 to ₹500 depending on your city.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-card" style="background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; gap: 20px;">
+                        <div class="step-number" style="width: 40px; height: 40px; background: #F6AD55; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">4</div>
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Receive Your Metal Tag</h3>
+                            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">Once approved, you'll get a registration certificate and a unique ID tag for your pet's collar. Remember to renew this annually!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="license-sidebar">
+                    <div style="background: #1A202C; border-radius: 24px; padding: 24px; color: white;">
+                        <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: #6366f1;">📍</span> Official Links
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <a href="https://ccmc.gov.in/" target="_blank" style="display: block; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; text-decoration: none; color: white; transition: background 0.3s;" onclick="window.open('https://ccmc.gov.in/', '_blank'); return false;">
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Coimbatore (CCMC)</div>
+                                <div style="font-size: 12px; color: #A0AEC0;">Official Portal → Public Health</div>
+                            </a>
+                            <a href="https://mcdonline.nic.in/petmcd" target="_blank" style="display: block; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; text-decoration: none; color: white; transition: background 0.3s;" onclick="window.open('https://mcdonline.nic.in/petmcd', '_blank'); return false;">
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Delhi (MCD)</div>
+                                <div style="font-size: 12px; color: #A0AEC0;">Direct Dog Registration Portal</div>
+                            </a>
+                            <a href="https://bbmp.gov.in/" target="_blank" style="display: block; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; text-decoration: none; color: white; transition: background 0.3s;" onclick="window.open('https://bbmp.gov.in/', '_blank'); return false;">
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Bengaluru (BBMP)</div>
+                                <div style="font-size: 12px; color: #A0AEC0;">Citizen Health Services</div>
+                            </a>
+                            <a href="https://portal.mcgm.gov.in/" target="_blank" style="display: block; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; text-decoration: none; color: white; transition: background 0.3s;" onclick="window.open('https://portal.mcgm.gov.in/', '_blank'); return false;">
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Mumbai (BMC)</div>
+                                <div style="font-size: 12px; color: #A0AEC0;">For Citizens → License-Dog</div>
+                            </a>
+                        </div>
+                        <div style="margin-top: 24px; padding: 16px; background: rgba(229, 62, 62, 0.2); border-radius: 16px; border: 1px solid #E53E3E;">
+                            <p style="font-size: 12px; color: #FC8181; font-weight: 700; line-height: 1.4;">⚠️ IMPORTANT: Fines for non-registration can range from ₹500 to ₹5000 depending on city bylaws.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; background: white; border-radius: 24px; padding: 24px; border: 1px solid var(--border); text-align: center;">
+                        <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
+                        <h4 style="font-weight: 800; margin-bottom: 8px;">Why License?</h4>
+                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">A license ensures your pet is legally recognized, vaccinated for rabies, and helps authorities reunite you if they get lost.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE SETTINGS -->
+        <div id="page-settings" class="page-content hidden">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Settings</h2>
+                <p style="color: var(--text-muted);">Manage your account and local storage.</p>
+            </div>
+            <div style="background: var(--white-solid); border-radius: var(--radius-xl); padding: 24px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Local Storage</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">If your journal is full or acting slow, you can clear your local data here.</p>
+                    <button onclick="if(confirm('Clear all journal entries and analysis history?')){ localStorage.removeItem('drpet_journal'); localStorage.removeItem('drpet_history'); location.reload(); }" style="background: #FFF5F5; color: #E53E3E; border: 1px solid #FED7D7; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">Clear Journal & History</button>
+                </div>
+                <div style="border-top: 1px solid var(--border); pt-4;">
+                    <button class="btn-primary" onclick="localStorage.clear(); window.location.href='login.html'" style="background: #4A5568; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px;">Log Out</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE SUPPORT -->
+        <div id="page-support" class="page-content hidden">
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Support</h2>
+                <p id="support-location-text" style="color: var(--text-muted);">Finding top veterinary professionals in Coimbatore...</p>
+            </div>
+
+            <div id="vet-hospitals-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+                <!-- HOSPITAL 1 -->
+                <div class="vet-card" style="background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                        <span style="background: #EBF8FF; color: var(--primary); padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 800;">24/7 OPEN</span>
+                        <div style="color: #F6E05E;">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">JP Pet Speciality Hospital</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">📍 RS Puram, Coimbatore</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <a href="tel:+919600623980" style="text-decoration: none; background: #EBF8FF; color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer; text-align: center; font-size: 13px;">📞 Call Now</a>
+                        <a href="http://www.jppethospital.com/" target="_blank" style="text-decoration: none; background: var(--primary); color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer; text-align: center; font-size: 13px;">🌐 Website</a>
+                    </div>
+                </div>
+
+                <!-- HOSPITAL 2 -->
+                <div class="vet-card" style="background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                        <span style="background: #F0FFF4; color: #38A169; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 800;">TOP RATED</span>
+                        <div style="color: #F6E05E;">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">SKS Veterinary Hospital</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">📍 Peelamedu, Coimbatore</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <a href="tel:+914224346656" style="text-decoration: none; background: #EBF8FF; color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer; text-align: center; font-size: 13px;">📞 Call Now</a>
+                        <button onclick="window.openBookingModal('SKS Veterinary Hospital')" style="background: var(--primary); color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer; text-align: center; font-size: 13px;">📅 Reserve</button>
+                    </div>
+                </div>
+
+                <!-- HOSPITAL 3 -->
+                <div class="vet-card" style="background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                        <span style="background: #FFF5F5; color: #E53E3E; padding: 4px 12px; border-radius: 99px; font-size: 11px; font-weight: 800;">EMERGENCY</span>
+                        <div style="color: #F6E05E;">⭐⭐⭐⭐</div>
+                    </div>
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Cotton City Pets Poly Clinic</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">📍 Saibaba Colony, Coimbatore</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <a href="tel:+918300114003" style="text-decoration: none; background: #EBF8FF; color: var(--primary); border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer; text-align: center; font-size: 13px;">📞 Call Now</a>
+                        <button onclick="window.openBookingModal('Cotton City Pets Poly Clinic')" style="background: var(--primary); color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 700; cursor: pointer; text-align: center; font-size: 13px;">📅 Reserve</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border-radius: 24px; padding: 40px; color: white; text-align: center;">
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 12px;">Instant AI Vet Consultation</h2>
+                <p style="opacity: 0.9; margin-bottom: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">Can't make it to a clinic? Talk to our AI Vet trained on global medical data for immediate advice.</p>
+                <button onclick="window.openAIChat()" style="background: white; color: #6366f1; border: none; border-radius: 16px; padding: 16px 32px; font-weight: 800; cursor: pointer; font-size: 16px;">Start Online Consultation</button>
+            </div>
+        </div>
+
+        <!-- AI VET CHAT MODAL -->
+        <div id="ai-chat-modal" class="modal-overlay hidden" onclick="window.closeAIChat()">
+            <div class="modal-content chat-modal-content" id="draggable-chat" onclick="event.stopPropagation()" style="max-width: 500px; height: 600px; display: flex; flex-direction: column; padding: 0; overflow: hidden; position: relative;">
+                <div class="chat-header" id="chat-header" style="background: #6366f1; color: white; padding: 20px; display: flex; align-items: center; gap: 12px; user-select: none;">
+                    <div style="font-size: 24px;">🩺</div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; margin: 0;">Dr. PET AI Assistant</h2>
+                        <p style="font-size: 12px; opacity: 0.8; margin: 0;">Online • Specialist Vet Engine</p>
+                    </div>
+                    <button onclick="window.closeAIChat()" style="margin-left: auto; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
+                </div>
+                <div id="ai-chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="background: white; padding: 12px 16px; border-radius: 16px 16px 16px 4px; max-width: 85%; align-self: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                        <p style="margin: 0; font-size: 14px; line-height: 1.5;">Hello! I am your AI Vet. How is your pet feeling today? Please describe any symptoms or behavioral changes.</p>
+                    </div>
+                </div>
+                <div style="padding: 20px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;">
+                    <input type="text" id="ai-chat-input" placeholder="Type your concerns here..." style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 14px;">
+                    <button onclick="window.sendAIVetMessage()" style="background: #6366f1; color: white; border: none; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Remote Modal -->
+<div id="remote-modal" class="modal-overlay hidden" onclick="closeRemoteModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 16px;">Remote Monitor</h2>
+        <p style="margin-bottom: 16px; color: var(--text-muted);">Open this link on your phone to turn it into a smart pet camera:</p>
+        <div style="background: #edf2f7; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-family: monospace; word-break: break-all;" id="remote-link-display"></div>
+        <button class="btn-primary" onclick="startRemoteMonitoring()" style="width:100%; padding: 12px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Start Listening</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="pet-selector-modal" class="modal-overlay hidden" onclick="closePetSelector()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 16px;">Switch Pet</h2>
+        <div id="pet-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+</div>
+
+<!-- Required IDs for app.js that were removed for cleanup but JS might crash if not found -->
+<div id="insight-idle" class="hidden"></div>
+<div id="metrics-card" class="hidden"></div>
+<div id="emotion-value" class="hidden"></div>
+<div id="ring-pct" class="hidden"></div>
+<div id="ring-fill" class="hidden"></div>
+<div id="emotion-icon" class="hidden"></div>
+<div id="happiness-score-text" class="hidden"></div>
+<div id="acoustic-sentiment" class="hidden"></div>
+<div id="anomaly-status" class="hidden"></div>
+<div id="rag-box" class="hidden"></div>
+
+<!-- Toast Notification Container -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#2D3748;color:white;padding:12px 24px;border-radius:99px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-lg);opacity:0;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);z-index:1000;font-weight:600;font-size:14px;pointer-events:none;">
+    <span id="toast-icon" style="font-size:18px;">✅</span>
+    <span id="toast-msg">Action completed</span>
+</div>
+
+<script>
+    const token = localStorage.getItem('drpet_token');
+    if (!token) window.location.href = 'login.html';
+    
+    // Page switching logic
+    function switchPage(pageId, navElement) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        if (navElement) navElement.classList.add('active');
+    }
+</script>
+<script src="app.js"></script>
+</body>
+</html>

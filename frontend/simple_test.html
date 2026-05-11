@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. PET - Simple Test UI</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            line-height: 1.6;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        #results {
+            white-space: pre-wrap;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .loading {
+            color: blue;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Dr. PET - Simple Test Interface</h1>
+
+    <div class="card">
+        <h3>1. Status Check</h3>
+        <button onclick="checkStatus()">Check API Health</button>
+        <p>API Status: <span id="api-status" class="status">Unknown</span></p>
+    </div>
+
+    <div class="card">
+        <h3>2. Upload Video for Analysis</h3>
+        <label for="video-input">Select Video:</label>
+        <input type="file" id="video-input" accept="video/*" title="Upload Video">
+        <button onclick="uploadVideo()">Analyze Video</button>
+        <div id="upload-status"></div>
+    </div>
+
+    <div class="card">
+        <h3>3. Analysis Results</h3>
+        <div id="results-container">
+            <p id="polling-status"></p>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentFileId = null;
+
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_URL}/api/health`);
+                const data = await response.json();
+                document.getElementById('api-status').innerText = data.status || 'OK';
+                document.getElementById('api-status').style.color = 'green';
+            } catch (error) {
+                document.getElementById('api-status').innerText = 'Offline';
+                document.getElementById('api-status').style.color = 'red';
+            }
+        }
+
+        async function uploadVideo() {
+            const fileInput = document.getElementById('video-input');
+            if (fileInput.files.length === 0) {
+                alert('Please select a video file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const statusDiv = document.getElementById('upload-status');
+            statusDiv.innerHTML = '<p class="loading">Uploading and starting analysis...</p>';
+
+            try {
+                const response = await fetch(`${API_URL}/analyze/video`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.file_id) {
+                    currentFileId = data.file_id;
+                    statusDiv.innerHTML = `<p style="color: green;">Analysis Started! ID: ${currentFileId}</p>`;
+                    pollResults(currentFileId);
+                } else {
+                    statusDiv.innerHTML = `<p class="error">Error: ${data.message || 'Unknown error'}</p>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">Upload failed. Is the backend running?</p>`;
+            }
+        }
+
+        async function pollResults(fileId) {
+            const pollingP = document.getElementById('polling-status');
+            const resultsDiv = document.getElementById('results');
+
+            pollingP.innerText = 'Analyzing... checking every 3 seconds...';
+            resultsDiv.style.display = 'none';
+
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/results/${fileId}`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed' || data.metrics) {
+                        clearInterval(interval);
+                        pollingP.innerText = 'Analysis Complete!';
+                        resultsDiv.innerText = JSON.stringify(data, null, 2);
+                        resultsDiv.style.display = 'block';
+                    } else if (data.status === 'error') {
+                        clearInterval(interval);
+                        pollingP.innerText = 'Analysis Failed';
+                        resultsDiv.innerText = data.message;
+                        resultsDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.warn('Polling error:', error);
+                }
+            }, 3000);
+        }
+
+        // Initial check
+        checkStatus();
+    </script>
+</body>
+
+</html>

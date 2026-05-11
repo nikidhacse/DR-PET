@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Dr. PET — Add Your Pet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #A78BFA;
+            --purple-dark: #8B5CF6;
+            --green-main: #6EE7B7;
+            --green-dark: #10B981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e0f7f0 50%, #f0f0ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .wrapper { width: 100%; max-width: 420px; }
+        .header-text { text-align: center; margin-bottom: 28px; }
+        .header-text h1 { font-size: 26px; font-weight: 800; color: #1F2937; }
+        .header-text p { color: #6B7280; font-size: 14px; margin-top: 6px; }
+        .card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 28px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        }
+        .species-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+        .species-btn {
+            padding: 12px 8px;
+            border: 2px solid #E5E7EB;
+            border-radius: 14px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .species-btn .emoji { font-size: 28px; display: block; margin-bottom: 4px; }
+        .species-btn span { font-size: 12px; font-weight: 600; color: #374151; }
+        .species-btn.selected {
+            border-color: var(--purple-main);
+            background: rgba(167,139,250,0.08);
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            outline: none;
+            color: #1F2937;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--purple-main);
+            box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+        }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--purple-main), var(--purple-dark));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,0.4); }
+        .btn-skip { 
+            width: 100%; padding: 12px; background: transparent; border: none; 
+            color: #9CA3AF; font-size: 14px; cursor: pointer; margin-top: 8px;
+        }
+        .btn-skip:hover { color: #6B7280; }
+        .error-msg { color: #EF4444; font-size: 13px; padding: 10px; background: #FEF2F2; border-radius: 10px; margin-bottom: 12px; display: none; }
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header-text">
+            <h1>Add Your Pet 🐾</h1>
+            <p>Let's set up your pet's profile for personalized analysis</p>
+        </div>
+        <div class="card">
+            <div class="error-msg" id="error-msg"></div>
+
+            <div class="form-group">
+                <label>What type of pet?</label>
+                <div class="species-grid">
+                    <div class="species-btn selected" onclick="selectSpecies(this, 'Dog')">
+                        <span class="emoji">🐕</span><span>Dog</span>
+                    </div>
+                    <div class="species-btn" onclick="selectSpecies(this, 'Cat')">
+                        <span class="emoji">🐈</span><span>Cat</span>
+                    </div>
+                    <div class="species-btn" onclick="selectSpecies(this, 'Bird')">
+                        <span class="emoji">🦜</span><span>Bird</span>
+                    </div>
+                    <div class="species-btn" onclick="selectSpecies(this, 'Rabbit')">
+                        <span class="emoji">🐇</span><span>Rabbit</span>
+                    </div>
+                    <div class="species-btn" onclick="selectSpecies(this, 'Fish')">
+                        <span class="emoji">🐟</span><span>Fish</span>
+                    </div>
+                    <div class="species-btn" onclick="selectSpecies(this, 'Other')">
+                        <span class="emoji">🐾</span><span>Other</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pet-name">Pet's Name *</label>
+                <input type="text" id="pet-name" placeholder="e.g. Max, Luna, Coco...">
+            </div>
+
+            <div class="form-group">
+                <label for="pet-breed">Breed (optional)</label>
+                <input type="text" id="pet-breed" placeholder="e.g. Golden Retriever, Siamese...">
+            </div>
+
+            <div class="row-2">
+                <div class="form-group">
+                    <label for="pet-age">Age (years)</label>
+                    <input type="number" id="pet-age" placeholder="e.g. 2" min="0" step="0.5">
+                </div>
+                <div class="form-group">
+                    <label for="pet-weight">Weight (kg)</label>
+                    <input type="number" id="pet-weight" placeholder="e.g. 5.5" min="0" step="0.1">
+                </div>
+            </div>
+
+            <button class="btn-primary" id="btn-save" onclick="savePet()">Save & Continue →</button>
+            <button class="btn-skip" onclick="skipOnboard()">Skip for now</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let selectedSpecies = 'Dog';
+
+        // Auth guard
+        const token = localStorage.getItem('drpet_token');
+        if (!token) window.location.replace('login.html');
+
+        function selectSpecies(el, species) {
+            document.querySelectorAll('.species-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedSpecies = species;
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        async function savePet() {
+            const name = document.getElementById('pet-name').value.trim();
+            if (!name) { showError('Please enter your pet\'s name.'); return; }
+
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Saving...';
+            document.getElementById('error-msg').style.display = 'none';
+
+            const body = {
+                name,
+                species: selectedSpecies,
+                breed: document.getElementById('pet-breed').value.trim(),
+                age_years: parseFloat(document.getElementById('pet-age').value) || 0,
+                weight_kg: parseFloat(document.getElementById('pet-weight').value) || 0
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/api/pets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) throw new Error('Failed to save pet.');
+                window.location.replace('index.html');
+            } catch (e) {
+                showError(e.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Save & Continue →';
+            }
+        }
+
+        function skipOnboard() {
+            window.location.replace('index.html');
+        }
+    </script>
+</body>
+</html>

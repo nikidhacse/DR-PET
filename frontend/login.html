@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Dr. PET — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-main: #A78BFA;
+            --purple-dark: #8B5CF6;
+            --green-main: #6EE7B7;
+            --green-dark: #10B981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e0f7f0 50%, #f0f0ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--purple-main), var(--green-main));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 36px;
+            box-shadow: 0 8px 32px rgba(167, 139, 250, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple-dark), var(--green-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-area p {
+            color: #6B7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .auth-card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 28px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        }
+
+        .tab-switcher {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 28px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--purple-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            transition: all 0.2s;
+            outline: none;
+            color: #1F2937;
+        }
+
+        .form-group input:focus {
+            border-color: var(--purple-main);
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
+        }
+
+        .form-group input.error {
+            border-color: #EF4444;
+        }
+
+        .error-msg {
+            color: #EF4444;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--purple-main), var(--purple-dark));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #E5E7EB;
+        }
+
+        .divider span {
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+
+        .global-error {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #DC2626;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden { display: none !important; }
+
+        .form-panel { animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .password-hint {
+            font-size: 11px;
+            color: #9CA3AF;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="logo-area">
+            <div class="logo-icon">🐾</div>
+            <h1>Dr. PET</h1>
+            <p>AI-Powered Pet Behavior Intelligence</p>
+        </div>
+
+        <div class="auth-card">
+            <div class="tab-switcher">
+                <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+            </div>
+
+            <div class="global-error" id="global-error"></div>
+
+            <!-- LOGIN FORM -->
+            <div id="form-login" class="form-panel">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+                </div>
+                <button class="btn-primary" id="btn-login" onclick="handleLogin()">Sign In →</button>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="form-register" class="form-panel hidden">
+                <div class="form-group">
+                    <label for="reg-name">Your Name</label>
+                    <input type="text" id="reg-name" placeholder="e.g. Ananya" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password">
+                    <p class="password-hint">Use at least 6 characters</p>
+                </div>
+                <button class="btn-primary" id="btn-register" onclick="handleRegister()">Create Account →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        // Redirect if already logged in
+        const token = localStorage.getItem('drpet_token');
+        if (token) {
+            fetch(`${API_URL}/api/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
+                .then(r => r.ok ? window.location.replace('index.html') : null)
+                .catch(() => {});
+        }
+
+        function switchTab(tab) {
+            const isLogin = tab === 'login';
+            document.getElementById('tab-login').classList.toggle('active', isLogin);
+            document.getElementById('tab-register').classList.toggle('active', !isLogin);
+            document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+            document.getElementById('form-register').classList.toggle('hidden', isLogin);
+            document.getElementById('global-error').style.display = 'none';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('global-error');
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>Please wait...';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.id === 'btn-login' ? 'Sign In →' : 'Create Account →';
+            }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            setLoading('btn-login', true);
+            document.getElementById('global-error').style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError(data.detail || 'Login failed.');
+                    setLoading('btn-login', false);
+                    return;
+                }
+
+                localStorage.setItem('drpet_token', data.token);
+                localStorage.setItem('drpet_user', JSON.stringify(data.user));
+                window.location.replace('index.html');
+            } catch (e) {
+                showError('Cannot reach server. Is it running?');
+                setLoading('btn-login', false);
+            }
+        }
+
+        async function handleRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+
+            if (!name || !email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters.');
+                return;
+            }
+
+            setLoading('btn-register', true);
+            document.getElementById('global-error').style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError(data.detail || 'Registration failed.');
+                    setLoading('btn-register', false);
+                    return;
+                }
+
+                localStorage.setItem('drpet_token', data.token);
+                localStorage.setItem('drpet_user', JSON.stringify(data.user));
+                // New user → go to onboarding
+                window.location.replace('onboard.html');
+            } catch (e) {
+                showError('Cannot reach server. Is it running?');
+                setLoading('btn-register', false);
+            }
+        }
+
+        // Allow Enter key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const loginHidden = document.getElementById('form-login').classList.contains('hidden');
+                if (loginHidden) handleRegister();
+                else handleLogin();
+            }
+        });
+    </script>
+</body>
+</html>

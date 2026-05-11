@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+ultralytics
+opencv-python-headless
+numpy
+python-multipart
+pydantic
+aiofiles
+librosa
+transformers
+torch
+torchaudio
+qdrant-client
+psycopg2-binary
+groq
+python-dotenv
+duckduckgo-search
